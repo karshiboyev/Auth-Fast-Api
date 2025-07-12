@@ -31,23 +31,19 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 @router.post("/send-code")
 async def send_code(email_request: EmailRequest, db: Session = Depends(get_db)):
-    """1-qadam: Email ga tasdiqlash kodini yuborish"""
     email = email_request.email
 
-    # 6 raqamli kod yaratish
     code = generate_verification_code()
     expires_at = datetime.utcnow() + timedelta(minutes=10)  # 10 daqiqa
 
-    # Database da foydalanuvchi mavjudligini tekshirish
     user = db.query(User).filter(User.email == email).first()
 
     if user:
-        # Mavjud foydalanuvchi uchun yangi kod
         user.verification_code = code
         user.code_expires_at = expires_at
         print(f"Mavjud foydalanuvchi uchun yangi kod: {code}")
     else:
-        # Yangi foydalanuvchi yaratish
+
         user = User(
             email=email,
             verification_code=code,
@@ -58,7 +54,6 @@ async def send_code(email_request: EmailRequest, db: Session = Depends(get_db)):
 
     db.commit()
 
-    # Console ga chiqarish
     print(f"\n{'=' * 50}")
     print(f"EMAIL YUBORILDI:")
     print(f"Kimga: {email}")
@@ -66,7 +61,6 @@ async def send_code(email_request: EmailRequest, db: Session = Depends(get_db)):
     print(f"Amal qilish muddati: {expires_at}")
     print(f"{'=' * 50}\n")
 
-    # Real email yuborish
     email_sent = send_verification_email(email, code)
 
     if email_sent:
@@ -79,14 +73,13 @@ async def send_code(email_request: EmailRequest, db: Session = Depends(get_db)):
         return {
             "message": "Tasdiqlash kodi yaratildi (email yuborilmadi - sozlamalarni tekshiring)",
             "email": email,
-            "code": code,  # Test uchun
+            "code": code,
             "expires_in": "10 daqiqa"
         }
 
 
 @router.post("/verify-code")
 async def verify_code(verify_request: VerifyCodeRequest, db: Session = Depends(get_db)):
-    """2-qadam: Yuborilgan kodni tekshirish"""
     email = verify_request.email
     code = verify_request.code
 
@@ -98,7 +91,6 @@ async def verify_code(verify_request: VerifyCodeRequest, db: Session = Depends(g
             detail="Foydalanuvchi topilmadi. Avval email ga kod yuboring."
         )
 
-    # Kod tekshirish
     if not user.verification_code or user.verification_code != code:
         print(f"Noto'g'ri kod: Kutilgan {user.verification_code}, Kelgan {code}")
         raise HTTPException(
@@ -106,7 +98,7 @@ async def verify_code(verify_request: VerifyCodeRequest, db: Session = Depends(g
             detail="Kod noto'g'ri. Qaytadan urinib ko'ring."
         )
 
-    # Vaqt tekshirish
+
     if user.code_expires_at and user.code_expires_at < datetime.utcnow():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -124,7 +116,6 @@ async def verify_code(verify_request: VerifyCodeRequest, db: Session = Depends(g
 
 @router.post("/set-password")
 async def set_password(password_request: SetPasswordRequest, db: Session = Depends(get_db)):
-    """3-qadam: Parol o'rnatish va ro'yxatdan o'tishni yakunlash"""
     email = password_request.email
     code = password_request.code
     password = password_request.password
@@ -137,28 +128,25 @@ async def set_password(password_request: SetPasswordRequest, db: Session = Depen
             detail="Foydalanuvchi topilmadi"
         )
 
-    # Kod tekshirish
     if not user.verification_code or user.verification_code != code:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Kod noto'g'ri yoki muddati tugagan"
         )
 
-    # Vaqt tekshirish
+
     if user.code_expires_at and user.code_expires_at < datetime.utcnow():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Kod muddati tugagan"
         )
 
-    # Parol uzunligi tekshirish
     if len(password) < 6:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Parol kamida 6 ta belgidan iborat bo'lishi kerak"
         )
 
-    # Parolni shifrlash va saqlash
     hashed_password = hash_password(password)
     user.password = hashed_password
     user.is_verified = True
@@ -178,7 +166,6 @@ async def set_password(password_request: SetPasswordRequest, db: Session = Depen
 
 @router.post("/login", response_model=Token)
 async def login(login_request: LoginRequest, db: Session = Depends(get_db)):
-    """4-qadam: Tizimga kirish"""
     email = login_request.email
     password = login_request.password
 
