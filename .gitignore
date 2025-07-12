@@ -1,0 +1,68 @@
+# Python bytecode fayllar
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual muhit papkasi
+venv/
+env/
+.venv/
+.env/
+
+# Maxfiy fayllar
+.env
+.env.local
+.env.production
+.env.staging
+
+# Log fayllar
+*.log
+logs/
+
+# IDE va editor fayllar
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS fayllar
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Vaqtinchalik fayllar
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Test coverage hisobotlari
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Build va distribution fayllar
+build/
+dist/
+*.egg-info/
+.wheel/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Database fayllar
+*.db
+*.sqlite
+*.sqlite3
+
+# Node.js (agar frontend ishlatilsa)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dokumentatsiya
+docs/_build/
