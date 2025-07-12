@@ -20,7 +20,6 @@ def generate_verification_code(length=6):
 
 
 def send_verification_email(email: str, code: str):
-    """Email orqali tasdiqlash kodini yuborish"""
     try:
         msg = MIMEMultipart()
         msg['From'] = EMAIL_ADDRESS

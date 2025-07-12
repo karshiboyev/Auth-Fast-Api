@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from routers import auth_router
 from utils import create_tables
-import uvicorn
 
 
 app = FastAPI(
@@ -10,10 +9,8 @@ app = FastAPI(
     description="Modulli authentication tizimi"
 )
 
-# Database jadvallarini yaratish
 create_tables()
 
-# Routerlarni qo'shish
 app.include_router(auth_router)
 
 
@@ -35,21 +32,4 @@ async def root():
     }
 
 
-if __name__ == "__main__":
-    print("🚀 Modulli Authentication API ishga tushmoqda...")
-    print("📖 Docs: http://localhost:8000/docs")
-    print("🔧 Barcha funksiyalar alohida modullarga ajratilgan")
-    print("\n" + "=" * 60)
-    print("PROYEKT STRUKTURASI:")
-    print("├── main.py              # Asosiy fayl")
-    print("├── .env                 # Environment variables")
-    print("├── models/user.py       # User modeli")
-    print("├── schemas/auth.py      # Pydantic schemas")
-    print("├── utils/               # Yordamchi funksiyalar")
-    print("│   ├── database.py      # Database setup")
-    print("│   ├── auth.py          # Auth utilities")
-    print("│   └── email.py         # Email functions")
-    print("└── routers/auth.py      # Auth routes")
-    print("=" * 60 + "\n")
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
